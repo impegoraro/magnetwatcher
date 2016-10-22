@@ -1,0 +1,12 @@
+[Unit]
+Description=Watches clipboard for a magnet link and sends it to transmission.
+
+[Service]
+Environment=TRANSMISSION_HOST=localhost
+#Environment=TRANSMISSION_PORT=9091
+#Environment=TRANSMISSION_USER=
+#Environment=TRANSMISSION_PWD=
+ExecStart=/usr/bin/magnet-watcher
+
+[Install]
+WantedBy=multi-user.target
