@@ -23,10 +23,12 @@ public:
 
         connect(reply, SIGNAL(finished()), this, SLOT(onSessionResponse()));
         connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onErrorResponse(QNetworkReply::NetworkError)));
+        connect(reply, SIGNAL(finished()), reply, SLOT(deleteLater()));
     }
 
 public slots:
     void addTorrent(const QString &torrent);
+    void addTorrentFile(const QString &url);
 
 protected slots:
     void onSessionResponse();

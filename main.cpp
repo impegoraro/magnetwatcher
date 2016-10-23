@@ -24,13 +24,33 @@ int main(int argc, char *argv[])
 
     QObject::connect(cp, &QClipboard::changed, [&](QClipboard::Mode m) {
         if(m == QClipboard::Clipboard) {
-            QString text = cp->text(m);
-
+            QString clip= cp->text(m);
+            QString text = clip;
             QRegExp reg("(magnet:[^ \t\n]+)");
+
             while(!text.isEmpty()) {
 
                 auto a = reg.indexIn(text);
-                if(a == -1) return;
+                if(a == -1) break;
+                int i = 0;
+
+                for (QString str : reg.capturedTexts()) {
+                    if(i) {
+                        tr.addTorrent(str);
+                        text = text.mid(str.length());
+                    }
+                    i++;
+                }
+
+            }
+
+            text = clip;
+
+            reg = QRegExp("(https?://[^ \t\n]+\\.torrent)");
+            while(!text.isEmpty()) {
+
+                auto a = reg.indexIn(text);
+                if(a == -1) break;
                 int i = 0;
 
                 for (QString str : reg.capturedTexts()) {
