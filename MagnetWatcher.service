@@ -7,6 +7,8 @@ Environment=TRANSMISSION_HOST=localhost
 #Environment=TRANSMISSION_USER=
 #Environment=TRANSMISSION_PWD=
 ExecStart=/usr/bin/magnet-watcher
+#User=nobody
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
