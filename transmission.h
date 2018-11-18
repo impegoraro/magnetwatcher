@@ -26,6 +26,9 @@ public:
         connect(reply, SIGNAL(finished()), reply, SLOT(deleteLater()));
     }
 
+Q_SIGNALS:
+    void retry();
+
 public slots:
     void addTorrent(const QString &torrent);
     void addTorrentFile(const QString &url);
@@ -43,6 +46,8 @@ protected:
     QString pwd;
 
     QNetworkAccessManager manager;
+
+    QNetworkReply* rpcMethod(const QString &name, QJsonObject arguments);
 };
 
 #endif // TRANSMISSION_H

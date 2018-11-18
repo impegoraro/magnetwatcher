@@ -22,20 +22,20 @@ int main(int argc, char *argv[])
 
     Transmission tr(host, port, user, pwd);
 
-    QObject::connect(cp, &QClipboard::changed, [&](QClipboard::Mode m) {
-        if(m == QClipboard::Clipboard) {
+    auto worker = [&](QClipboard::Mode m) {
+        if (m == QClipboard::Clipboard) {
             QString clip= cp->text(m);
             QString text = clip;
             QRegExp reg("(magnet:[^ \t\n]+)");
 
-            while(!text.isEmpty()) {
+            while (!text.isEmpty()) {
 
                 auto a = reg.indexIn(text);
                 if(a == -1) break;
                 int i = 0;
 
                 for (QString str : reg.capturedTexts()) {
-                    if(i) {
+                    if (i) {
                         tr.addTorrent(str);
                         text = text.mid(str.length());
                     }
@@ -64,6 +64,12 @@ int main(int argc, char *argv[])
             }
 
         }
+    };
+
+    QObject::connect(cp, &QClipboard::changed, worker);
+    QObject::connect(&tr, &Transmission::retry, [&] () {
+        worker(QClipboard::Clipboard);
     });
+
     return a.exec();
 }
