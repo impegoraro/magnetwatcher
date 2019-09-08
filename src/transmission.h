@@ -1,17 +1,17 @@
-#ifndef TRANSMISSION_H
-#define TRANSMISSION_H
+#pragma once
 
 #include <QObject>
 
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
+
 class Transmission : public QObject
 {
     Q_OBJECT
 public:
     Transmission(const QString &host, const QString &port, const QString &user="", const QString &pwd ="") :
-        host(host), port(port), user(user), pwd(pwd)
+        mHost(host), mPort(port), mUser(user), mPassword(pwd)
     {
         QNetworkRequest req(QStringLiteral("http://%1:%2/transmission/rpc").arg(host, port));
         if(!user.isEmpty() && !pwd.isEmpty()) {
@@ -39,15 +39,13 @@ private slots:
     //void onTorrentAdded();
 
 private:
-    QString m_session;
-    QString host;
-    QString port;
-    QString user;
-    QString pwd;
+    QString mSession;
+    QString mHost;
+    QString mPort;
+    QString mUser;
+    QString mPassword;
 
     QNetworkAccessManager manager;
 
     QNetworkReply* rpcMethod(const QString &name, const QJsonObject &arguments);
 };
-
-#endif // TRANSMISSION_H

@@ -10,21 +10,21 @@ void Transmission::onSessionResponse()
     auto *reply   = dynamic_cast<QNetworkReply*>(sender());
     auto  session = reply->rawHeader("X-Transmission-Session-Id");
 
-    this->m_session = session;
+    this->mSession = session;
 }
 
 QNetworkReply* Transmission::rpcMethod(const QString &name, const QJsonObject &arguments)
 {
-    QNetworkRequest request{QStringLiteral("http://%1:%2/transmission/rpc").arg(host, port)};
+    QNetworkRequest request{QStringLiteral("http://%1:%2/transmission/rpc").arg(mHost, mPort)};
 
-    if (!user.isEmpty()) {
-        QString cred = QString("%1:%2").arg(user,pwd);
+    if (!mUser.isEmpty()) {
+        QString cred = QString("%1:%2").arg(mUser,mPassword);
         request.setRawHeader("Authentication",
                              QString("Basic %1").arg(QString(cred.toLatin1().toBase64())).toLatin1());
     }
     QNetworkReply *reply{nullptr};
 
-    if (name.isEmpty() || m_session.isEmpty()) {
+    if (name.isEmpty() || mSession.isEmpty()) {
         reply = manager.get(request);
 
         connect(reply, &QNetworkReply::finished, this, &Transmission::onSessionResponse);
@@ -36,7 +36,7 @@ QNetworkReply* Transmission::rpcMethod(const QString &name, const QJsonObject &a
         body.insert("arguments", arguments);
 
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-        request.setRawHeader("X-Transmission-Session-Id", m_session.toLatin1());
+        request.setRawHeader("X-Transmission-Session-Id", mSession.toLatin1());
 
         reply = manager.post(request, QJsonDocument(body).toJson(QJsonDocument::Compact));
 
@@ -49,7 +49,7 @@ QNetworkReply* Transmission::rpcMethod(const QString &name, const QJsonObject &a
 
                 reg.indexIn(r);
                 if (reg.captureCount() == 1) {
-                    this->m_session = reg.cap(1);
+                    this->mSession = reg.cap(1);
 
                     Q_EMIT(this->retry());
                 }
