@@ -33,12 +33,12 @@ public slots:
     void addTorrent(const QString &torrent);
     void addTorrentFile(const QString &url);
 
-protected slots:
+private slots:
     void onSessionResponse();
     void onErrorResponse(QNetworkReply::NetworkError);
     //void onTorrentAdded();
 
-protected:
+private:
     QString m_session;
     QString host;
     QString port;
@@ -47,7 +47,7 @@ protected:
 
     QNetworkAccessManager manager;
 
-    QNetworkReply* rpcMethod(const QString &name, QJsonObject arguments);
+    QNetworkReply* rpcMethod(const QString &name, const QJsonObject &arguments);
 };
 
 #endif // TRANSMISSION_H
