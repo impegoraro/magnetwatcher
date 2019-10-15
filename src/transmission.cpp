@@ -58,6 +58,8 @@ QNetworkReply* Transmission::rpcMethod(const QString &name, const QJsonObject &a
 
                 if (response.value("result") != "success") { Q_EMIT(this->retry()); return; }
 
+                Q_EMIT(added());
+
                 if (response.value("arguments").toObject().contains("torrent-duplicate"))
                     qCritical()<< "torrent duplicate"
                                 << response.value("arguments").toObject()
@@ -72,7 +74,6 @@ QNetworkReply* Transmission::rpcMethod(const QString &name, const QJsonObject &a
         connect(reply, static_cast<void(QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
                 [reply] (QNetworkReply::NetworkError) {
                     auto r = reply->readAll();
-                    //QJsonObject response = QJsonDocument::fromJson(r).object();
 
                     qCritical()<< "torrent failed: "<< r;
                 });
@@ -113,6 +114,7 @@ void Transmission::addTorrentFile(const QString &url)
 
 void Transmission::onErrorResponse(QNetworkReply::NetworkError)
 {
+    if (mSession.isEmpty()) return;
     auto *reply = dynamic_cast<QNetworkReply*>(sender());
     qCritical()<< ":: response error: "<< reply->errorString();
     Q_EMIT(retry());

@@ -10,24 +10,26 @@ class Transmission : public QObject
 {
     Q_OBJECT
 public:
-    Transmission(const QString &host, const QString &port, const QString &user="", const QString &pwd ="") :
-        mHost(host), mPort(port), mUser(user), mPassword(pwd)
+    Transmission(QString host, QString port, QString user = "", QString pwd = "") :
+        mHost{std::move(host)}, mPort{std::move(port)}, mUser{std::move(user)}, mPassword{std::move(pwd)}
     {
-        QNetworkRequest req(QStringLiteral("http://%1:%2/transmission/rpc").arg(host, port));
-        if(!user.isEmpty() && !pwd.isEmpty()) {
-            QString cred = QString("%1:%2").arg(user,pwd);
+        QNetworkRequest req(QStringLiteral("http://%1:%2/transmission/rpc").arg(mHost, mPort));
+        if (!mUser.isEmpty()) {
+            QString cred = QString("%1:%2").arg(mUser, mPassword);
             req.setRawHeader("Authentication", QString("Basic %1").arg(QString(cred.toLatin1().toBase64())).toLatin1());
         }
 
         auto reply = manager.get(req);
 
         connect(reply, SIGNAL(finished()), this, SLOT(onSessionResponse()));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onErrorResponse(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(finished()), reply, SLOT(deleteLater()));
+        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+                this, SLOT(onErrorResponse(QNetworkReply::NetworkError)));
+        connect(reply, &QNetworkReply::finished, reply, &QObject::deleteLater);
     }
 
 Q_SIGNALS:
     void retry();
+    void added();
 
 public slots:
     void addTorrent(const QString &torrent);
